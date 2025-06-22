@@ -50,6 +50,15 @@ void p() {
     display_on_hex(prediction);
 }
 ```
+### Camera Module
+The **OV7670** camera module is used to capture real-time grayscale images at a resultion of 640x480 pixels. Interfacing with the camera involved configuring the SCCB (Serial Camera Control Bus) to set internal registers and capture frames using the FPGA’s **VDMA** and **AXI GPIO** interfaces.
+
+To reduce memory bandwidth and processing requirements, the raw image was:
+
+1. **Downsampled** to 28×28 using **nearest neighbor interpolation** in hardware, converting it to a format compatible with the MNIST dataset.
+2. processed pixel by pixel, implementing an Finite State Machine to ensure synchronization with camera's **VSYNC** and **PCLK** signals.
+3. **Stored in on-chip memory BRAM**, and then passed to the MicroBlaze processor for inference.
+4. A custom **I²C driver** was implemented in SystemVerilog to communicate with the camera over SCCB. This driver handled start/stop conditions, byte-level transmission, color-mode initialization, and acknowledgment checking to ensure reliable register writes during initialization.
 
 
 ### Tools
@@ -57,6 +66,7 @@ void p() {
 - **Vitis SDK**
 - **TensorFlow**
 - **C/C++**
+- **Inter-Integrated Circuit Driver: SCCB**
 
 ### Hardware
 - **RealDigital Urbana** FPGA Board  
